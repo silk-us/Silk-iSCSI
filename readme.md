@@ -31,3 +31,8 @@ Select Install location:
 
 ### Example usage: 
 Please see the [Command Refence](./Documents/Command_Reference.md) for a full explination of the exported commands. 
+
+
+## A note on using `-verbose`
+
+As this module is primarily a wrapper for the native Microsoft iSCSI powershell cmdlets, Specifying `-verbose` on any command will show you the underlying commands that are bring issued. 
