@@ -30,4 +30,4 @@ Select Install location:
 ```
 
 ### Example usage: 
-Please see the [Command Refence]("./Documents/Command_Reference.md") for a full explination of the exported commands. 
+Please see the [Command Refence]("/Documents/Command_Reference.md") for a full explination of the exported commands. 
