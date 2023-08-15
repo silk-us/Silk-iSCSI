@@ -42,9 +42,13 @@ Specifying `-nodeAddress` will connect to a cnode where there are multiple Silk 
 Connect-SilkCnode -cnodeIP 10.10.10.134 -nodeAddress 'iqn.2009-01.us.silk:storage.sdp.12345602'
 ```
 
-## Remove-SilkCNode
+## Disconnect-SilkCNode
 Disconnect a Silk CNode and all of its sessions. You cannot specify a specific number of sessions, it will remove all sessions. 
-* `-nodeAddress`: (Optional) [string] The iqn of a specific Silk SDP. Required in cases where the host is connected to multiple SDPs. 
+* `-cnodeIP`: (Required) [string] Specifies the IP Address of the Silk SDP CNode you wish to connect to. 
+* `-rebalance`: (Optional) [switch] Automatically refactor the sessions so they maintain the current total session count.
+* `-force`: (Optional) [switch] Attempts to more-forcibly remove session information as it pertains to the specified CNode. Useful when trying to remove orphaned iscsi sessions. 
+
+
 ### Example:
 ```PowerShell
 Disconnect-SilkCnode -cnodeIP 10.10.10.134
