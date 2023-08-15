@@ -83,5 +83,17 @@ CNode IP     Host IP   Configured Sessions Connected Sessions Silk IQN
 10.10.10.133 10.12.1.6                   8                  8 iqn.2009-01.us.silk:storage.sdp.12345602
 10.10.10.134 10.12.1.6                   8                  8 iqn.2009-01.us.silk:storage.sdp.12345602
 ```
-
+### Example:
 This command similarly supports `-nodeAddress`
+```PowerShell
+Set-SilkSessionBalance -sessionsPer 8 -nodeAddress 'iqn.2009-01.us.silk:storage.sdp.12345602'
+```
+
+## Remove-SilkSDP
+This command will remove all connection information for a specified Silk SDP.
+* `-nodeAddress`: (Optional) [string] The iqn of a specific Silk SDP. Required in cases where the host is connected to multiple SDPs. 
+
+### Example
+```PowerShell
+Remove-SilkSDP -nodeAddress 'iqn.2009-01.us.silk:storage.sdp.12345602'
+```
