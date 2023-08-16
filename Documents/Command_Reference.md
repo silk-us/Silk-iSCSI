@@ -2,7 +2,7 @@
 
 ## Get-SilkSessions
 This simply queries for any existing Silk SDP sessions configured on the windows host. Even if those sessions were not configuring using the Silk-iSCSI module. Pipe it to `Format-Table` (`ft`) for better readability. 
-* `-cnodeIP`: (Optional) [string] THe IP for a specific CNode. This will return only the connection information for the specified CNode. 
+* `-cnodeIP`: (Optional) [string] The IP for a specific CNode. This will return only the connection information for the specified CNode. 
 * `-nodeAddress`: (Optional) [string] The iqn of a specific Silk SDP. Useful in cases where the host is connected to multiple SDPs. 
 * `-update`: (Optional) [switch] Forces an Update-MPIOClaimedHW "rescan" of the device list. This can be useful when accounting for recent disk changes. 
 * `-totalOnly`: (Optional) [switch] This returns a consolodated tally that includes a total number of sessions only. Primarily used for programatic queries. 
