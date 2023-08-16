@@ -104,4 +104,4 @@ Remove-SilkSDP -nodeAddress 'iqn.2009-01.us.silk:storage.sdp.12345602'
 
 ## A note on using `-verbose`
 
-As this module is primarily a wrapper for the native Microsoft iSCSI powershell cmdlets, Specifying `-verbose` on any command will show you the underlying commands that are bring issued. 
+As this module is primarily a wrapper for the native Microsoft iSCSI powershell cmdlets, Specifying `-verbose` on any command will show you the underlying commands that are being issued. 
