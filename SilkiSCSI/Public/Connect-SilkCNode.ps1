@@ -45,11 +45,20 @@ function Connect-SilkCNode {
     # Use the decided upon interface to connect
     $v = "Determined interface " + $sourceNic.InterfaceAlias + " as prefered source."
     $iSCSIData1 = Get-NetIPAddress -InterfaceAlias $sourceNic.InterfaceAlias -AddressFamily ipv4
+
+    if ($iSCSIData1.IPAddress.GetType().name -ne 'String') {
+        $iSCSIData1Address = $iSCSIData1.IPAddress[0]
+        $message = ">> Multiple IP addresses detected, using: " + $iSCSIData1Address
+        $message | Write-Verbose
+    } else {
+        $iSCSIData1Address= $iSCSIData1.IPAddress
+    }
+
     if ($chapCredentials) {
-        $cmd = "--> New-IscsiTargetPortal -TargetPortalAddress " + $cnodeIP.IPAddressToString + " -TargetPortalPortNumber 3260 -InitiatorPortalAddress " + $iSCSIData1.IPAddress + ' -ChapUserName ' + $chapUser + " -ChapSecret " + $chapSecret + ' -AuthenticationType ONEWAYCHAP'
+        $cmd = "--> New-IscsiTargetPortal -TargetPortalAddress " + $cnodeIP.IPAddressToString + " -TargetPortalPortNumber 3260 -InitiatorPortalAddress " + $iSCSIData1Address + ' -ChapUserName ' + $chapUser + " -ChapSecret " + $chapSecret + ' -AuthenticationType ONEWAYCHAP'
         $cmd | Write-Verbose
         try {
-            New-IscsiTargetPortal -TargetPortalAddress $cnodeIP.IPAddressToString -TargetPortalPortNumber 3260 -InitiatorPortalAddress $iSCSIData1.IPAddress -ChapUserName $chapUser -ChapSecret $chapSecret -AuthenticationType ONEWAYCHAP | Out-Null
+            New-IscsiTargetPortal -TargetPortalAddress $cnodeIP.IPAddressToString -TargetPortalPortNumber 3260 -InitiatorPortalAddress $iSCSIData1Address -ChapUserName $chapUser -ChapSecret $chapSecret -AuthenticationType ONEWAYCHAP | Out-Null
         } catch {
             Write-Verbose "-- Connect-IscsiTargetPortal failed -- Verify chap username and secret"
             $error[0]
@@ -57,9 +66,9 @@ function Connect-SilkCNode {
         }
         
     } else {
-        $cmd = "--> New-IscsiTargetPortal -TargetPortalAddress " + $cnodeIP.IPAddressToString + " -TargetPortalPortNumber 3260 -InitiatorPortalAddress " + $iSCSIData1.IPAddress 
+        $cmd = "--> New-IscsiTargetPortal -TargetPortalAddress " + $cnodeIP.IPAddressToString + " -TargetPortalPortNumber 3260 -InitiatorPortalAddress " + $iSCSIData1Address 
         $cmd | Write-Verbose
-        New-IscsiTargetPortal -TargetPortalAddress $cnodeIP.IPAddressToString -TargetPortalPortNumber 3260 -InitiatorPortalAddress $iSCSIData1.IPAddress | Out-Null
+        New-IscsiTargetPortal -TargetPortalAddress $cnodeIP.IPAddressToString -TargetPortalPortNumber 3260 -InitiatorPortalAddress $iSCSIData1Address | Out-Null
     }
 
     # Check this for instances where you are connecting to multiple SDPs
@@ -75,18 +84,18 @@ function Connect-SilkCNode {
     $session = 0
     while ($session -lt $SessionCount) {
         if ($chapCredentials) {
-            $v = "Connecting session " + $session + " to " + $cnodeIP.IPAddressToString + " via " + $iSCSIData1.IPAddress
+            $v = "Connecting session " + $session + " to " + $cnodeIP.IPAddressToString + " via " + $iSCSIData1Address
             $v | Write-Verbose
-            $cmd = '--> Connect-IscsiTarget -NodeAddress ' + $SDPIQN.NodeAddress + ' -TargetPortalAddress ' + $cnodeIP.IPAddressToString + ' -TargetPortalPortNumber 3260 -InitiatorPortalAddress ' + $iSCSIData1.IPAddress + ' -IsPersistent $true -IsMultipathEnabled $true' + ' -ChapUserName ' + $chapUser + ' -ChapSecret ' + $chapSecret + ' -AuthenticationType ONEWAYCHAP'
+            $cmd = '--> Connect-IscsiTarget -NodeAddress ' + $SDPIQN.NodeAddress + ' -TargetPortalAddress ' + $cnodeIP.IPAddressToString + ' -TargetPortalPortNumber 3260 -InitiatorPortalAddress ' + $iSCSIData1Address + ' -IsPersistent $true -IsMultipathEnabled $true' + ' -ChapUserName ' + $chapUser + ' -ChapSecret ' + $chapSecret + ' -AuthenticationType ONEWAYCHAP'
             $cmd | Write-Verbose
-            Connect-IscsiTarget -NodeAddress $SDPIQN.NodeAddress -TargetPortalAddress $cnodeIP.IPAddressToString -TargetPortalPortNumber 3260 -InitiatorPortalAddress $iSCSIData1.IPAddress -IsPersistent $true -IsMultipathEnabled $true -ChapUsername $chapUser -ChapSecret $chapSecret -AuthenticationType ONEWAYCHAP | Out-Null
+            Connect-IscsiTarget -NodeAddress $SDPIQN.NodeAddress -TargetPortalAddress $cnodeIP.IPAddressToString -TargetPortalPortNumber 3260 -InitiatorPortalAddress $iSCSIData1Address -IsPersistent $true -IsMultipathEnabled $true -ChapUsername $chapUser -ChapSecret $chapSecret -AuthenticationType ONEWAYCHAP | Out-Null
             $session++
         } else {
-            $v = "Connecting session " + $session + " to " + $cnodeIP.IPAddressToString + " via " + $iSCSIData1.IPAddress
+            $v = "Connecting session " + $session + " to " + $cnodeIP.IPAddressToString + " via " + $iSCSIData1Address
             $v | Write-Verbose
-            $cmd = '--> Connect-IscsiTarget -NodeAddress ' + $SDPIQN.NodeAddress + ' -TargetPortalAddress ' + $cnodeIP.IPAddressToString + ' -TargetPortalPortNumber 3260 -InitiatorPortalAddress ' + $iSCSIData1.IPAddress + ' -IsPersistent $true -IsMultipathEnabled $true'
+            $cmd = '--> Connect-IscsiTarget -NodeAddress ' + $SDPIQN.NodeAddress + ' -TargetPortalAddress ' + $cnodeIP.IPAddressToString + ' -TargetPortalPortNumber 3260 -InitiatorPortalAddress ' + $iSCSIData1Address + ' -IsPersistent $true -IsMultipathEnabled $true'
             $cmd | Write-Verbose
-            Connect-IscsiTarget -NodeAddress $SDPIQN.NodeAddress -TargetPortalAddress $cnodeIP.IPAddressToString -TargetPortalPortNumber 3260 -InitiatorPortalAddress $iSCSIData1.IPAddress -IsPersistent $true -IsMultipathEnabled $true | Out-Null
+            Connect-IscsiTarget -NodeAddress $SDPIQN.NodeAddress -TargetPortalAddress $cnodeIP.IPAddressToString -TargetPortalPortNumber 3260 -InitiatorPortalAddress $iSCSIData1Address -IsPersistent $true -IsMultipathEnabled $true | Out-Null
             $session++
         }
 
