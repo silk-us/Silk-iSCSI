@@ -32,8 +32,8 @@ function Remove-SilkStaleSessions {
             Write-Verbose "Removing session $sid from the session list."
 
             Write-Verbose "--> Unregister-IscsiSession -SessionIdentifier $sid"
-            Unregister-IscsiSession -SessionIdentifier $sid -ErrorAction SilentlyContinue 
-            
+            Unregister-IscsiSession -SessionIdentifier $sid -ErrorAction SilentlyContinue
+
             Write-Verbose "--> Disconnect-IscsiTarget -SessionIdentifier $sid -Confirm:0"
             Disconnect-IscsiTarget -SessionIdentifier $sid -Confirm:0 -ErrorAction SilentlyContinue 
         }
@@ -57,11 +57,11 @@ function Remove-SilkStaleSessions {
                 $cmd = "--> Get-IscsiTarget | Update-IscsiTarget"
                 $cmd | Write-Verbose
                 Get-IscsiTarget | Update-IscsiTarget -ErrorAction SilentlyContinue | Out-Null
-    
+
                 $cmd = "--> Get-IscsiTargetPortal | Update-IscsiTargetPortal"
                 $cmd | Write-Verbose
                 Get-IscsiTargetPortal | Update-IscsiTargetPortal -ErrorAction SilentlyContinue | Out-Null
-    
+
                 $v = "Updating MPIO claim."
                 $v | Write-Verbose
                 Write-Verbose "--> Update-MPIOClaimedHW -Confirm:0"

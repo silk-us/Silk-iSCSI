@@ -16,9 +16,9 @@ function Remove-SilkSDP {
         }
     } else {
         $return = "No target with $nodeaddress discovered."
-        return $return | Write-Error 
+        return $return | Write-Error
     }
 
     $return = Get-SilkSessions
-    return $return 
-} 
+    return $return
+}
