@@ -9,6 +9,11 @@ function Remove-SilkSDP {
         $nodeAddress = $nodeSelect.NodeAddress
     }
     $allsessions = Get-SilkSessions | Where-Object {$_.'Silk IQN' -eq $nodeaddress}
+    }
+
+    # output sessions to be removed
+    Write-Host "Sessions to be removed:"
+    $allsessions | Format-Table
 
     if ($allsessions) {
         foreach ($i in $allsessions) {
