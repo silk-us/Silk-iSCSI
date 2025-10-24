@@ -5,7 +5,7 @@ function Remove-SilkSDP {
     )
 
     if (!$nodeAddress) {
-        $nodeSelect = Select-SilkSDP -message "Please select the correct node address to remote entirely" -force
+        $nodeSelect = Select-SilkSDP -message "Please select the correct node address to remove entirely" -force
         $nodeAddress = $nodeSelect.NodeAddress
     }
     $allsessions = Get-SilkSessions | Where-Object {$_.'Silk IQN' -eq $nodeaddress}
