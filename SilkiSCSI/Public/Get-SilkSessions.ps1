@@ -11,7 +11,7 @@ function Get-SilkSessions {
     )
 
     if ($update) {
-        Update-MPIOClaimedHW -Confirm:0 | Out-Null # Rescan
+        Update-MPIOClaimedHW -Confirm:$false | Out-Null # Rescan
     }
 
     if ($nodeAddress) {
@@ -27,7 +27,7 @@ function Get-SilkSessions {
         }
         if (!$allConnections -and $target) {
             Write-Verbose "SCSI query failed - forcing MPIO claim update"
-            Update-MPIOClaimedHW -Confirm:0 | Out-Null # Rescan
+            Update-MPIOClaimedHW -Confirm:$false | Out-Null # Rescan
             Start-Sleep -Seconds 4
             if ($nodeAddress) {
                 $target = Get-IscsiTarget -NodeAddress $nodeAddress
@@ -45,7 +45,7 @@ function Get-SilkSessions {
         }
         if (!$allConnections -and $target) {
             Write-Verbose "SCSI query failed - forcing MPIO claim update"
-            Update-MPIOClaimedHW -Confirm:0 | Out-Null # Rescan
+            Update-MPIOClaimedHW -Confirm:$false | Out-Null # Rescan
             Start-Sleep -Seconds 4
             if ($nodeAddress) {
                 $target = Get-IscsiTarget -NodeAddress $nodeAddress

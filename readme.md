@@ -9,7 +9,7 @@ Import-Module ./path/SilkiSCSI/SilkiSCSI.psd1
 
 Or install via the PowerShell Gallery
 ```powershell
-Find-Module SilkiSCSI | Install-Module -confirm:0
+Find-Module SilkiSCSI | Install-Module -Confirm:$false
 ```
 
 Or, run the provided InstallSilkiSCSI.ps1 script.

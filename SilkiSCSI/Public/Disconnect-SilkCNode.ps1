@@ -43,16 +43,16 @@ function Disconnect-SilkCNode {
                 Write-Verbose "--> Unregister-IscsiSession -SessionIdentifier $sid"
                 Unregister-IscsiSession -SessionIdentifier $sid -ErrorAction SilentlyContinue
 
-                Write-Verbose "--> Disconnect-IscsiTarget -SessionIdentifier $sid -Confirm:0"
-                Disconnect-IscsiTarget -SessionIdentifier $sid -Confirm:0 -ErrorAction SilentlyContinue 
+                Write-Verbose "--> Disconnect-IscsiTarget -SessionIdentifier $sid -Confirm:$false"
+                Disconnect-IscsiTarget -SessionIdentifier $sid -Confirm:$false -ErrorAction SilentlyContinue
 
             }
         }
         if ($update) {
             $v = "Updating MPIO claim."
             $v | Write-Verbose
-            Write-Verbose "--> Update-MPIOClaimedHW -Confirm:0"
-            Update-MPIOClaimedHW -Confirm:0 | Out-Null # Rescan
+            Write-Verbose "--> Update-MPIOClaimedHW -Confirm:$false"
+            Update-MPIOClaimedHW -Confirm:$false | Out-Null # Rescan
         }
 
 
@@ -61,9 +61,9 @@ function Disconnect-SilkCNode {
     if ($portal) {
         $v = "Portal on IP " + $cnodeIP.IPAddressToString + " discovered, removing portal from the configuration."
         $v | Write-Verbose
-        $cmd = "--> Remove-IscsiTargetPortal -TargetPortalAddress " + $cnodeIP.IPAddressToString + " -InitiatorInstanceName " + $portal.InitiatorInstanceName + " -InitiatorPortalAddress " + $portal.InitiatorPortalAddress + " -Confirm:0"
+        $cmd = "--> Remove-IscsiTargetPortal -TargetPortalAddress " + $cnodeIP.IPAddressToString + " -InitiatorInstanceName " + $portal.InitiatorInstanceName + " -InitiatorPortalAddress " + $portal.InitiatorPortalAddress + " -Confirm:$false"
         $cmd | Write-Verbose
-        Remove-IscsiTargetPortal -TargetPortalAddress $cnodeIP.IPAddressToString -InitiatorInstanceName $portal.InitiatorInstanceName -InitiatorPortalAddress $portal.InitiatorPortalAddress -Confirm:0 | Out-Null
+        Remove-IscsiTargetPortal -TargetPortalAddress $cnodeIP.IPAddressToString -InitiatorInstanceName $portal.InitiatorInstanceName -InitiatorPortalAddress $portal.InitiatorPortalAddress -Confirm:$false | Out-Null
 
         if ($update) {
             $cmd = "--> Get-IscsiTarget | Update-IscsiTarget"
@@ -76,8 +76,8 @@ function Disconnect-SilkCNode {
 
             $v = "Updating MPIO claim."
             $v | Write-Verbose
-            Write-Verbose "--> Update-MPIOClaimedHW -Confirm:0"
-            Update-MPIOClaimedHW -Confirm:0 | Out-Null # Rescan
+            Write-Verbose "--> Update-MPIOClaimedHW -Confirm:$false"
+            Update-MPIOClaimedHW -Confirm:$false | Out-Null # Rescan
         }
     }
 
