@@ -14,8 +14,8 @@ function Disconnect-SilkCNode {
     $total = Get-SilkSessions -totalOnly
 
     # Try clearing the portal LAST...
-    
-    # Removes persistence for those now-undiscovered sessions 
+
+    # Removes persistence for those now-undiscovered sessions
     if ($force) {
         if ($rebalance) {
             $msg = "You cannot use -force with -rebalance. Please select one, and then the other."
@@ -26,58 +26,58 @@ function Disconnect-SilkCNode {
         $portal = Get-IscsiTargetPortal | Where-Object {$_.TargetPortalAddress -eq $cnodeIP.IPAddressToString}
         $allConnections = Get-IscsiConnection | where-object {$_.TargetAddress -eq $cnodeIP.IPAddressToString}
     }
-    
+
 
     # Chnage this to a while loop, and put a counter threshold on to run through it perhaps 3 times in case the connections remain after the MPIO claim
-    if ($allConnections) { 
+    if ($allConnections) {
         $killSessions =  $allConnections | Get-IscsiSession  # ensure unique sessions for the desired portal
 
         if ($killSessions) {
             $v = "Discovered " + $killSessions.count + " iscsi sessions to remove."
             $v | Write-Verbose
-    
+
             foreach ($k in $killSessions) {
                 $sid = $k.SessionIdentifier
                 Write-Verbose "Removing session $sid from the session list."
 
                 Write-Verbose "--> Unregister-IscsiSession -SessionIdentifier $sid"
-                Unregister-IscsiSession -SessionIdentifier $sid -ErrorAction SilentlyContinue 
-                
-                Write-Verbose "--> Disconnect-IscsiTarget -SessionIdentifier $sid -Confirm:0"
-                Disconnect-IscsiTarget -SessionIdentifier $sid -Confirm:0 -ErrorAction SilentlyContinue 
-                
+                Unregister-IscsiSession -SessionIdentifier $sid -ErrorAction SilentlyContinue
+
+                Write-Verbose "--> Disconnect-IscsiTarget -SessionIdentifier $sid -Confirm:$false"
+                Disconnect-IscsiTarget -SessionIdentifier $sid -Confirm:$false -ErrorAction SilentlyContinue
+
             }
         }
         if ($update) {
             $v = "Updating MPIO claim."
             $v | Write-Verbose
-            Write-Verbose "--> Update-MPIOClaimedHW -Confirm:0"
-            Update-MPIOClaimedHW -Confirm:0 | Out-Null # Rescan
+            Write-Verbose "--> Update-MPIOClaimedHW -Confirm:$false"
+            Update-MPIOClaimedHW -Confirm:$false | Out-Null # Rescan
         }
 
 
-    } 
+    }
 
     if ($portal) {
         $v = "Portal on IP " + $cnodeIP.IPAddressToString + " discovered, removing portal from the configuration."
         $v | Write-Verbose
-        $cmd = "--> Remove-IscsiTargetPortal -TargetPortalAddress " + $cnodeIP.IPAddressToString + " -InitiatorInstanceName " + $portal.InitiatorInstanceName + " -InitiatorPortalAddress " + $portal.InitiatorPortalAddress + " -Confirm:0"
+        $cmd = "--> Remove-IscsiTargetPortal -TargetPortalAddress " + $cnodeIP.IPAddressToString + " -InitiatorInstanceName " + $portal.InitiatorInstanceName + " -InitiatorPortalAddress " + $portal.InitiatorPortalAddress + " -Confirm:$false"
         $cmd | Write-Verbose
-        Remove-IscsiTargetPortal -TargetPortalAddress $cnodeIP.IPAddressToString -InitiatorInstanceName $portal.InitiatorInstanceName -InitiatorPortalAddress $portal.InitiatorPortalAddress -Confirm:0 | Out-Null
+        Remove-IscsiTargetPortal -TargetPortalAddress $cnodeIP.IPAddressToString -InitiatorInstanceName $portal.InitiatorInstanceName -InitiatorPortalAddress $portal.InitiatorPortalAddress -Confirm:$false | Out-Null
 
         if ($update) {
             $cmd = "--> Get-IscsiTarget | Update-IscsiTarget"
             $cmd | Write-Verbose
             Get-IscsiTarget | Update-IscsiTarget -ErrorAction SilentlyContinue | Out-Null
-    
+
             $cmd = "--> Get-IscsiTargetPortal | Update-IscsiTargetPortal"
             $cmd | Write-Verbose
             Get-IscsiTargetPortal | Update-IscsiTargetPortal -ErrorAction SilentlyContinue | Out-Null
 
             $v = "Updating MPIO claim."
             $v | Write-Verbose
-            Write-Verbose "--> Update-MPIOClaimedHW -Confirm:0"
-            Update-MPIOClaimedHW -Confirm:0 | Out-Null # Rescan
+            Write-Verbose "--> Update-MPIOClaimedHW -Confirm:$false"
+            Update-MPIOClaimedHW -Confirm:$false | Out-Null # Rescan
         }
     }
 
@@ -96,4 +96,4 @@ function Disconnect-SilkCNode {
 
     return $return | Format-Table
 
-} 
+}

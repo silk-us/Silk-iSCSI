@@ -11,12 +11,12 @@ function Get-SilkSessions {
     )
 
     if ($update) {
-        Update-MPIOClaimedHW -Confirm:0 | Out-Null # Rescan
+        Update-MPIOClaimedHW -Confirm:$false | Out-Null # Rescan
     }
 
     if ($nodeAddress) {
         $target = Get-IscsiTarget -NodeAddress $nodeAddress
-    } 
+    }
 
     if ($cnodeIP) {
         if ($nodeAddress) {
@@ -27,7 +27,7 @@ function Get-SilkSessions {
         }
         if (!$allConnections -and $target) {
             Write-Verbose "SCSI query failed - forcing MPIO claim update"
-            Update-MPIOClaimedHW -Confirm:0 | Out-Null # Rescan
+            Update-MPIOClaimedHW -Confirm:$false | Out-Null # Rescan
             Start-Sleep -Seconds 4
             if ($nodeAddress) {
                 $target = Get-IscsiTarget -NodeAddress $nodeAddress
@@ -39,19 +39,19 @@ function Get-SilkSessions {
     } else {
         if ($nodeAddress) {
             $target = Get-IscsiTarget -NodeAddress $nodeAddress
-            $allConnections = Get-IscsiTarget -NodeAddress $target.NodeAddress | Get-IscsiConnection -ErrorAction silentlycontinue 
+            $allConnections = Get-IscsiTarget -NodeAddress $target.NodeAddress | Get-IscsiConnection -ErrorAction silentlycontinue
         } else {
-            $allConnections = Get-IscsiConnection -ErrorAction silentlycontinue 
+            $allConnections = Get-IscsiConnection -ErrorAction silentlycontinue
         }
         if (!$allConnections -and $target) {
             Write-Verbose "SCSI query failed - forcing MPIO claim update"
-            Update-MPIOClaimedHW -Confirm:0 | Out-Null # Rescan
+            Update-MPIOClaimedHW -Confirm:$false | Out-Null # Rescan
             Start-Sleep -Seconds 4
             if ($nodeAddress) {
                 $target = Get-IscsiTarget -NodeAddress $nodeAddress
-                $allConnections = Get-IscsiTarget -NodeAddress $target.NodeAddress | Get-IscsiConnection -ErrorAction silentlycontinue 
+                $allConnections = Get-IscsiTarget -NodeAddress $target.NodeAddress | Get-IscsiConnection -ErrorAction silentlycontinue
             } else {
-                $allConnections = Get-IscsiConnection -ErrorAction silentlycontinue 
+                $allConnections = Get-IscsiConnection -ErrorAction silentlycontinue
             }
         }
     }
@@ -60,14 +60,14 @@ function Get-SilkSessions {
         Write-Verbose "No connections listed - terminating query"
         return $null
     }
-    
+
     $returnArray = @()
 
     # Change this query to Get-IscsiTargetPortal to better represent orphaned target portals.
     $allTargetIPs = ($allConnections | Select-Object TargetAddress -Unique).TargetAddress
     # $alltargetIPs = (Get-IscsiTargetPortal).TargetPortalAddress
 
-    $configuredTotal = 0 
+    $configuredTotal = 0
     $connectedTotal = 0
     $cnodeTotal = 0
 
@@ -93,7 +93,7 @@ function Get-SilkSessions {
             $connectedTotal = $connectedTotal + $connected
             $o | Add-Member -MemberType NoteProperty -Name "Connected Sessions" -Value $connected
         } else {
-            $o | Add-Member -MemberType NoteProperty -Name "Connected Sessions" -Value 0 
+            $o | Add-Member -MemberType NoteProperty -Name "Connected Sessions" -Value 0
         }
         $o | Add-Member -MemberType NoteProperty -Name "Silk IQN" -Value ($allConnections | Where-Object {$_.TargetAddress -eq $i} |Get-IscsiSession | Select-Object TargetNodeAddress -Unique).TargetNodeAddress
 
@@ -113,7 +113,7 @@ function Get-SilkSessions {
 
     if ($returnArray) {
         $returnArray = $returnArray | Sort-Object "CNode IP"
-        return $returnArray 
+        return $returnArray
     } else {
         return $null
     }
