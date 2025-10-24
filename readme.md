@@ -1,7 +1,7 @@
 # Silk iSCSI Services Connection Module (SISCM)
-This module is a wrapper for the native iSCSI and MPIO powershell modules, created to help ease the management connections and sessions to Silk SDP CNodes. 
+This module is a wrapper for the native iSCSI and MPIO powershell modules, created to help ease the management connections and sessions to Silk SDP CNodes.
 
-### Installation 
+### Installation
 Manually install
 ```powershell
 Import-Module ./path/SilkiSCSI/SilkiSCSI.psd1
@@ -12,12 +12,12 @@ Or install via the PowerShell Gallery
 Find-Module SilkiSCSI | Install-Module -confirm:0
 ```
 
-Or, run the provided InstallSilkiSCSI.ps1 script. 
+Or, run the provided InstallSilkiSCSI.ps1 script.
 ```powershell
 Unblock-File .\InstallSilkiSCSI.ps1
 .\InstallSilkiSCSI.ps1
 ```
-Which gives you a simple install menu. 
+Which gives you a simple install menu.
 ```powershell
 ------
 1. C:\Users\user\Documents\PowerShell\Modules
@@ -29,7 +29,7 @@ Which gives you a simple install menu.
 Select Install location:
 ```
 
-### Example usage: 
-Please see the [Command Refence](./Documents/Command_Reference.md) for a full explanation of the exported commands. 
+### Example usage:
+Please see the [Command Refence](./Documents/Command_Reference.md) for a full explanation of the exported commands.
 
 
