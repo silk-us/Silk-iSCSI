@@ -1,14 +1,23 @@
 function Remove-SilkSDP {
+    [CmdletBinding(DefaultParameterSetName="nodeAddress")]
+
     param(
-        [Parameter()]
-        [string] $nodeAddress
+        [Parameter(ParameterSetName="nodeAddress")]
+        [string] $nodeAddress,
+
+        [Parameter(ParameterSetName="All")]
+        [switch] $All
     )
 
-    if (!$nodeAddress) {
-        $nodeSelect = Select-SilkSDP -message "Please select the correct node address to remove entirely" -force
-        $nodeAddress = $nodeSelect.NodeAddress
+    if ($All) {
+        $allsessions = Get-SilkSessions
     }
-    $allsessions = Get-SilkSessions | Where-Object {$_.'Silk IQN' -eq $nodeaddress}
+    else {
+        if (!$nodeAddress) {
+            $nodeSelect = Select-SilkSDP -message "Please select the correct node address to remove entirely" -force
+            $nodeAddress = $nodeSelect.NodeAddress
+        }
+        $allsessions = Get-SilkSessions | Where-Object {$_.'Silk IQN' -eq $nodeaddress}
     }
 
     # output sessions to be removed
