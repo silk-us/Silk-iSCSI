@@ -101,6 +101,10 @@ function Connect-SilkCNode {
 
     }
 
+    # Set silk quick recovery
+
+    Set-SilkQuickiSCSIRecovery
+
     # Return Get-SilkSessions 
 
     $return = Get-SilkSessions -NodeAddress $SDPIQN.NodeAddress
