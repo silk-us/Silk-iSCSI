@@ -28,7 +28,7 @@ function Set-SilkQuickiSCSIRecovery {
             'TCPConnectTime' = 15
             'TCPDisconnectTime' = 15
             'DelayBetweenReconnect' = 5
-            'EnableNOPOut' = 'Disabled'
+            'EnableNOPOut' = 0
             'MaxRequestHoldTime' = 60
             'LinkDownTime' = 15
             'SrbTimeoutDelta' = 15
@@ -39,7 +39,7 @@ function Set-SilkQuickiSCSIRecovery {
             'TCPConnectTime' = 3
             'TCPDisconnectTime' = 3
             'DelayBetweenReconnect' = 3
-            'EnableNOPOut' = 'Enabled'
+            'EnableNOPOut' = 1
             'MaxRequestHoldTime' = 10
             'LinkDownTime' = 3
             'SrbTimeoutDelta' = 3
@@ -51,7 +51,7 @@ function Set-SilkQuickiSCSIRecovery {
         Write-Verbose "Applying quick iSCSI recovery settings."
         foreach ($key in $parameterSplat.Keys) {
             Write-Verbose "-> Setting $key to $($parameterSplat[$key])"
-            Set-ItemProperty -Path $parameterPath -Name $key -Value $parameterSplat[$key]
+            Set-ItemProperty -Path $parameterPath -Name $key -Value $parameterSplat[$key] -Type DWord
         }
     }
 }
