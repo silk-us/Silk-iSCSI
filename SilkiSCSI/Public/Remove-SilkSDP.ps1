@@ -26,7 +26,11 @@ function Remove-SilkSDP {
 
     if ($allsessions) {
         foreach ($i in $allsessions) {
-            Disconnect-SilkCNode -cnodeIP $i.'CNode IP'
+            try {
+                Disconnect-SilkCNode -cnodeIP $i.'CNode IP' -ErrorAction Stop
+            } catch {
+                Write-Error "Could not disconnect CNode $($i.'CNode IP') - $($_.Exception.Message)"
+            }
         }
     } else {
         $return = "No target with $nodeaddress discovered."

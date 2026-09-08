@@ -32,11 +32,19 @@ function Set-SilkSessionBalance {
         if ($nodeSessions -lt $sessionsPer) {
             $sessionCount = $sessionsPer - $nodeSessions
             Write-Verbose "---- Adding - $sessionCount - to CNode - $cnodeIP -"
-            Connect-SilkCNode -SessionCount $sessionCount -cnodeIP $cnodeIP -NodeAddress $nodeAddress| Out-Null
+            try {
+                Connect-SilkCNode -SessionCount $sessionCount -cnodeIP $cnodeIP -NodeAddress $nodeAddress -ErrorAction Stop | Out-Null
+            } catch {
+                Write-Error "Could not add $sessionCount session(s) to CNode $cnodeIP - $($_.Exception.Message)"
+            }
         } elseif ($nodeSessions -gt $sessionsPer) {
             Write-Verbose "---- Removing - $cnodeIP - and adding $sessionsPer"
-            Disconnect-SilkCNode -cnodeIP $cnodeIP | Out-Null
-            Connect-SilkCNode -cnodeIP $cnodeIP -SessionCount $sessionsPer -NodeAddress $nodeAddress | Out-Null
+            try {
+                Disconnect-SilkCNode -cnodeIP $cnodeIP -ErrorAction Stop | Out-Null
+                Connect-SilkCNode -cnodeIP $cnodeIP -SessionCount $sessionsPer -NodeAddress $nodeAddress -ErrorAction Stop | Out-Null
+            } catch {
+                Write-Error "Could not rebalance CNode $cnodeIP to $sessionsPer session(s) - $($_.Exception.Message)"
+            }
         }
     }
 }

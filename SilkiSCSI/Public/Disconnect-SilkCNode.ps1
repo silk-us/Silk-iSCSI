@@ -2,8 +2,8 @@ function Disconnect-SilkCNode {
     param(
         [Parameter(Mandatory)]
         [ipaddress] $cnodeIP,
-        [Parameter()]
-        [switch] $force,
+        # [Parameter()]
+        # [switch] $force,
         [Parameter()]
         [switch] $rebalance,
         [Parameter()]
@@ -16,16 +16,16 @@ function Disconnect-SilkCNode {
     # Try clearing the portal LAST...
 
     # Removes persistence for those now-undiscovered sessions
-    if ($force) {
-        if ($rebalance) {
-            $msg = "You cannot use -force with -rebalance. Please select one, and then the other."
-            return $msg | Write-Error
-        }
-        Remove-SilkStaleSessions -cnodeIP $cnodeIP.IPAddressToString -force
-    } else {
+    # if ($force) {
+    #     if ($rebalance) {
+    #         $msg = "You cannot use -force with -rebalance. Please select one, and then the other."
+    #         return $msg | Write-Error
+    #     }
+    #     Remove-SilkStaleSessions -cnodeIP $cnodeIP.IPAddressToString -force
+    # } else {
         $portal = Get-IscsiTargetPortal | Where-Object {$_.TargetPortalAddress -eq $cnodeIP.IPAddressToString}
         $allConnections = Get-IscsiConnection | where-object {$_.TargetAddress -eq $cnodeIP.IPAddressToString}
-    }
+    # }
 
 
     # Chnage this to a while loop, and put a counter threshold on to run through it perhaps 3 times in case the connections remain after the MPIO claim
@@ -52,7 +52,11 @@ function Disconnect-SilkCNode {
             $v = "Updating MPIO claim."
             $v | Write-Verbose
             Write-Verbose "--> Update-MPIOClaimedHW -Confirm:$false"
-            Update-MPIOClaimedHW -Confirm:$false | Out-Null # Rescan
+            try {
+                Update-MPIOClaimedHW -Confirm:$false -ErrorAction Stop | Out-Null # Rescan
+            } catch {
+                Write-Error "Could not update the MPIO claim - $($_.Exception.Message)"
+            }
         }
 
 
@@ -63,7 +67,11 @@ function Disconnect-SilkCNode {
         $v | Write-Verbose
         $cmd = "--> Remove-IscsiTargetPortal -TargetPortalAddress " + $cnodeIP.IPAddressToString + " -InitiatorInstanceName " + $portal.InitiatorInstanceName + " -InitiatorPortalAddress " + $portal.InitiatorPortalAddress + " -Confirm:$false"
         $cmd | Write-Verbose
-        Remove-IscsiTargetPortal -TargetPortalAddress $cnodeIP.IPAddressToString -InitiatorInstanceName $portal.InitiatorInstanceName -InitiatorPortalAddress $portal.InitiatorPortalAddress -Confirm:$false | Out-Null
+        try {
+            Remove-IscsiTargetPortal -TargetPortalAddress $cnodeIP.IPAddressToString -InitiatorInstanceName $portal.InitiatorInstanceName -InitiatorPortalAddress $portal.InitiatorPortalAddress -Confirm:$false -ErrorAction Stop | Out-Null
+        } catch {
+            Write-Error "Could not remove the target portal for $($cnodeIP.IPAddressToString) - $($_.Exception.Message)"
+        }
 
         if ($update) {
             $cmd = "--> Get-IscsiTarget | Update-IscsiTarget"
@@ -77,9 +85,15 @@ function Disconnect-SilkCNode {
             $v = "Updating MPIO claim."
             $v | Write-Verbose
             Write-Verbose "--> Update-MPIOClaimedHW -Confirm:$false"
-            Update-MPIOClaimedHW -Confirm:$false | Out-Null # Rescan
+            try {
+                Update-MPIOClaimedHW -Confirm:$false -ErrorAction Stop | Out-Null # Rescan
+            } catch {
+                Write-Error "Could not update the MPIO claim - $($_.Exception.Message)"
+            }
         }
     }
+
+    Get-SilkPersistentTargets -cnodeIP $cnodeIP | Remove-SilkPersistentTargets
 
     $return = Get-SilkSessions
 

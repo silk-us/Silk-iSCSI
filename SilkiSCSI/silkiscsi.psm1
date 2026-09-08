@@ -20,4 +20,4 @@ Foreach($import in @($Public + $Private))
 
 Export-ModuleMember -Function $Public.Basename -alias * 
 
-Write-Host "--- Loaded $num functions ---"
+Write-Verbose "--- Loaded $num functions ---" -Verbose

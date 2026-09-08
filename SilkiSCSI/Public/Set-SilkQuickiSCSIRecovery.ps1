@@ -51,7 +51,11 @@ function Set-SilkQuickiSCSIRecovery {
         Write-Verbose "Applying quick iSCSI recovery settings."
         foreach ($key in $parameterSplat.Keys) {
             Write-Verbose "-> Setting $key to $($parameterSplat[$key])"
-            Set-ItemProperty -Path $parameterPath -Name $key -Value $parameterSplat[$key] -Type DWord
+            try {
+                Set-ItemProperty -Path $parameterPath -Name $key -Value $parameterSplat[$key] -Type DWord -ErrorAction Stop
+            } catch {
+                Write-Error "Could not set $key under $parameterPath - $($_.Exception.Message)"
+            }
         }
     }
 }

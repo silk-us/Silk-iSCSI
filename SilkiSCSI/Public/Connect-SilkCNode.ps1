@@ -12,6 +12,10 @@ function Connect-SilkCNode {
         [switch] $rebalance
     )
 
+    # Set silk quick recovery
+
+    Set-SilkQuickiSCSIRecovery
+
     # Process
 
     # information gathering for current status
@@ -39,7 +43,11 @@ function Connect-SilkCNode {
         Write-Verbose " -chapCredentials specified --- connecting using chap authentication"
         $cmd = "--> Set-IscsiChapSecret -ChapSecret " + $chapSecret
         $cmd | Write-Verbose
-        Set-IscsiChapSecret -ChapSecret $chapSecret
+        try {
+            Set-IscsiChapSecret -ChapSecret $chapSecret -ErrorAction Stop
+        } catch {
+            return "Could not set the CHAP secret - $($_.Exception.Message)" | Write-Error
+        }
     }
 
     # Use the decided upon interface to connect
@@ -61,14 +69,18 @@ function Connect-SilkCNode {
             New-IscsiTargetPortal -TargetPortalAddress $cnodeIP.IPAddressToString -TargetPortalPortNumber 3260 -InitiatorPortalAddress $iSCSIData1Address -ChapUserName $chapUser -ChapSecret $chapSecret -AuthenticationType ONEWAYCHAP | Out-Null
         } catch {
             Write-Verbose "-- Connect-IscsiTargetPortal failed -- Verify chap username and secret"
-            $error[0]
+            Write-Error "Could not add the target portal for $($cnodeIP.IPAddressToString) using CHAP - $($_.Exception.Message). Verify the CHAP username and secret match the SDP."
             break
         }
         
     } else {
         $cmd = "--> New-IscsiTargetPortal -TargetPortalAddress " + $cnodeIP.IPAddressToString + " -TargetPortalPortNumber 3260 -InitiatorPortalAddress " + $iSCSIData1Address 
         $cmd | Write-Verbose
-        New-IscsiTargetPortal -TargetPortalAddress $cnodeIP.IPAddressToString -TargetPortalPortNumber 3260 -InitiatorPortalAddress $iSCSIData1Address | Out-Null
+        try {
+            New-IscsiTargetPortal -TargetPortalAddress $cnodeIP.IPAddressToString -TargetPortalPortNumber 3260 -InitiatorPortalAddress $iSCSIData1Address -ErrorAction Stop | Out-Null
+        } catch {
+            return "Could not add the target portal for $($cnodeIP.IPAddressToString) via $iSCSIData1Address - $($_.Exception.Message)" | Write-Error
+        }
     }
 
     # Check this for instances where you are connecting to multiple SDPs
@@ -88,22 +100,28 @@ function Connect-SilkCNode {
             $v | Write-Verbose
             $cmd = '--> Connect-IscsiTarget -NodeAddress ' + $SDPIQN.NodeAddress + ' -TargetPortalAddress ' + $cnodeIP.IPAddressToString + ' -TargetPortalPortNumber 3260 -InitiatorPortalAddress ' + $iSCSIData1Address + ' -IsPersistent $true -IsMultipathEnabled $true' + ' -ChapUserName ' + $chapUser + ' -ChapSecret ' + $chapSecret + ' -AuthenticationType ONEWAYCHAP'
             $cmd | Write-Verbose
-            Connect-IscsiTarget -NodeAddress $SDPIQN.NodeAddress -TargetPortalAddress $cnodeIP.IPAddressToString -TargetPortalPortNumber 3260 -InitiatorPortalAddress $iSCSIData1Address -IsPersistent $true -IsMultipathEnabled $true -ChapUsername $chapUser -ChapSecret $chapSecret -AuthenticationType ONEWAYCHAP | Out-Null
+            try {
+                Connect-IscsiTarget -NodeAddress $SDPIQN.NodeAddress -TargetPortalAddress $cnodeIP.IPAddressToString -TargetPortalPortNumber 3260 -InitiatorPortalAddress $iSCSIData1Address -IsPersistent $true -IsMultipathEnabled $true -ChapUsername $chapUser -ChapSecret $chapSecret -AuthenticationType ONEWAYCHAP -ErrorAction Stop | Out-Null
+            } catch {
+                Write-Error "Session $session to $($cnodeIP.IPAddressToString) failed - $($_.Exception.Message)"
+            }
             $session++
         } else {
             $v = "Connecting session " + $session + " to " + $cnodeIP.IPAddressToString + " via " + $iSCSIData1Address
             $v | Write-Verbose
             $cmd = '--> Connect-IscsiTarget -NodeAddress ' + $SDPIQN.NodeAddress + ' -TargetPortalAddress ' + $cnodeIP.IPAddressToString + ' -TargetPortalPortNumber 3260 -InitiatorPortalAddress ' + $iSCSIData1Address + ' -IsPersistent $true -IsMultipathEnabled $true'
             $cmd | Write-Verbose
-            Connect-IscsiTarget -NodeAddress $SDPIQN.NodeAddress -TargetPortalAddress $cnodeIP.IPAddressToString -TargetPortalPortNumber 3260 -InitiatorPortalAddress $iSCSIData1Address -IsPersistent $true -IsMultipathEnabled $true | Out-Null
+            try {
+                Connect-IscsiTarget -NodeAddress $SDPIQN.NodeAddress -TargetPortalAddress $cnodeIP.IPAddressToString -TargetPortalPortNumber 3260 -InitiatorPortalAddress $iSCSIData1Address -IsPersistent $true -IsMultipathEnabled $true -ErrorAction Stop | Out-Null
+            } catch {
+                Write-Error "Session $session to $($cnodeIP.IPAddressToString) failed - $($_.Exception.Message)"
+            }
             $session++
         }
 
     }
 
-    # Set silk quick recovery
 
-    Set-SilkQuickiSCSIRecovery
 
     # Return Get-SilkSessions 
 

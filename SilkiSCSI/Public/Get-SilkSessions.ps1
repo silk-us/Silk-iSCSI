@@ -20,8 +20,11 @@ function Get-SilkSessions {
 
     if ($cnodeIP) {
         if ($nodeAddress) {
+            # Get-IscsiTarget can hand back a row per portal/session pairing rather than
+            # one per iqn. piping those dupes into Get-IscsiConnection multiplies the
+            # connection list and inflates the tally, so squash em first.
             $target = Get-IscsiTarget -NodeAddress $nodeAddress
-            $allConnections = Get-IscsiTarget -NodeAddress $target.NodeAddress | Get-IscsiConnection -ErrorAction silentlycontinue | where-object {$_.TargetAddress -eq $cnodeIP.IPAddressToString}
+            $allConnections = Get-IscsiTarget -NodeAddress $target.NodeAddress | Sort-Object NodeAddress -Unique | Get-IscsiConnection -ErrorAction silentlycontinue | where-object {$_.TargetAddress -eq $cnodeIP.IPAddressToString}
         } else {
             $allConnections = Get-IscsiConnection -ErrorAction silentlycontinue | where-object {$_.TargetAddress -eq $cnodeIP.IPAddressToString}
         }
@@ -31,7 +34,7 @@ function Get-SilkSessions {
             Start-Sleep -Seconds 4
             if ($nodeAddress) {
                 $target = Get-IscsiTarget -NodeAddress $nodeAddress
-                $allConnections = Get-IscsiTarget -NodeAddress $target.NodeAddress | Get-IscsiConnection -ErrorAction silentlycontinue | where-object {$_.TargetAddress -eq $cnodeIP.IPAddressToString}
+                $allConnections = Get-IscsiTarget -NodeAddress $target.NodeAddress | Sort-Object NodeAddress -Unique | Get-IscsiConnection -ErrorAction silentlycontinue | where-object {$_.TargetAddress -eq $cnodeIP.IPAddressToString}
             } else {
                 $allConnections = Get-IscsiConnection -ErrorAction silentlycontinue | where-object {$_.TargetAddress -eq $cnodeIP.IPAddressToString}
             }
@@ -39,7 +42,7 @@ function Get-SilkSessions {
     } else {
         if ($nodeAddress) {
             $target = Get-IscsiTarget -NodeAddress $nodeAddress
-            $allConnections = Get-IscsiTarget -NodeAddress $target.NodeAddress | Get-IscsiConnection -ErrorAction silentlycontinue
+            $allConnections = Get-IscsiTarget -NodeAddress $target.NodeAddress | Sort-Object NodeAddress -Unique | Get-IscsiConnection -ErrorAction silentlycontinue
         } else {
             $allConnections = Get-IscsiConnection -ErrorAction silentlycontinue
         }
@@ -49,7 +52,7 @@ function Get-SilkSessions {
             Start-Sleep -Seconds 4
             if ($nodeAddress) {
                 $target = Get-IscsiTarget -NodeAddress $nodeAddress
-                $allConnections = Get-IscsiTarget -NodeAddress $target.NodeAddress | Get-IscsiConnection -ErrorAction silentlycontinue
+                $allConnections = Get-IscsiTarget -NodeAddress $target.NodeAddress | Sort-Object NodeAddress -Unique | Get-IscsiConnection -ErrorAction silentlycontinue
             } else {
                 $allConnections = Get-IscsiConnection -ErrorAction silentlycontinue
             }
